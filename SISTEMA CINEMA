@@ -1,0 +1,160 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Definindo a estrutura de um Filme
+typedef struct {
+    char titulo[100];
+    char genero[50];
+    int duracao;  // em minutos
+    int classificacao;  // idade mínima
+} Filme;
+
+// Definindo a estrutura de uma Sala
+typedef struct {
+    int numero;  // número da sala
+    int capacidade;  // número de assentos
+    int assentos[100];  // 0 = disponível, 1 = ocupado
+} Sala;
+
+// Definindo a estrutura de uma Sessão
+typedef struct {
+    Filme filme;
+    Sala sala;
+    char horario[6];  // formato HH:MM
+} Sessao;
+
+// Definindo a estrutura de um Ingresso
+typedef struct {
+    Sessao sessao;
+    int assento;
+    float preco;
+} Ingresso;
+
+// Função para adicionar um filme
+void adicionarFilme(Filme *filme) {
+    printf("Digite o título do filme: ");
+    fgets(filme->titulo, 100, stdin);
+    filme->titulo[strcspn(filme->titulo, "\n")] = 0;  // Remover o '\n'
+
+    printf("Digite o gênero do filme: ");
+    fgets(filme->genero, 50, stdin);
+    filme->genero[strcspn(filme->genero, "\n")] = 0;
+
+    printf("Digite a duração do filme (em minutos): ");
+    scanf("%d", &filme->duracao);
+
+    printf("Digite a classificação indicativa: ");
+    scanf("%d", &filme->classificacao);
+
+    getchar();  // Limpar o buffer de entrada
+    printf("Filme adicionado com sucesso!\n");
+}
+
+// Função para criar uma sessão
+void criarSessao(Sessao *sessao, Filme filme, Sala sala) {
+    sessao->filme = filme;
+    sessao->sala = sala;
+
+    printf("Digite o horário da sessão (HH:MM): ");
+    scanf("%s", sessao->horario);
+
+    // Inicializar todos os assentos como disponíveis (0)
+    for (int i = 0; i < sala.capacidade; i++) {
+        sessao->sala.assentos[i] = 0;
+    }
+
+    printf("Sessão criada com sucesso para o filme %s às %s na sala %d!\n",
+           filme.titulo, sessao->horario, sala.numero);
+}
+
+// Função para exibir uma sessão
+void exibirSessao(Sessao sessao) {
+    printf("\n--- Detalhes da Sessão ---\n");
+    printf("Filme: %s\n", sessao.filme.titulo);
+    printf("Gênero: %s\n", sessao.filme.genero);
+    printf("Duração: %d minutos\n", sessao.filme.duracao);
+    printf("Classificação: %d anos\n", sessao.filme.classificacao);
+    printf("Sala: %d\n", sessao.sala.numero);
+    printf("Horário: %s\n", sessao.horario);
+}
+
+// Função para reservar um assento
+void reservarAssento(Sessao *sessao, int *assentoEscolhido) {
+    int assento;
+
+    printf("Escolha o número do assento (1-%d): ", sessao->sala.capacidade);
+    scanf("%d", &assento);
+
+    // Verifica se o assento é válido e está disponível
+    if (assento > 0 && assento <= sessao->sala.capacidade) {
+        if (sessao->sala.assentos[assento - 1] == 0) {
+            sessao->sala.assentos[assento - 1] = 1;  // Marcar assento como ocupado
+            *assentoEscolhido = assento;  // Atualiza o assento escolhido
+            printf("Assento %d reservado com sucesso!\n", assento);
+        } else {
+            printf("Assento já está ocupado!\n");
+            *assentoEscolhido = -1;  // Indica que não foi possível reservar
+        }
+    } else {
+        printf("Número de assento inválido!\n");
+        *assentoEscolhido = -1;  // Indica que o assento é inválido
+    }
+}
+
+// Função para gerar um ingresso
+void gerarIngresso(Sessao sessao, int assento) {
+    if (assento == -1) {
+        printf("Erro: assento inválido ou já ocupado.\n");
+        return;
+    }
+
+    Ingresso ingresso;
+    ingresso.sessao = sessao;
+    ingresso.assento = assento;
+    ingresso.preco = 30.0;  // Definindo preço fixo
+
+    printf("\n--- INGRESSO ---\n");
+    printf("Filme: %s\n", sessao.filme.titulo);
+    printf("Sala: %d\n", sessao.sala.numero);
+    printf("Horário: %s\n", sessao.horario);
+    printf("Assento: %d\n", assento);
+    printf("Preço: R$ %.2f\n", ingresso.preco);
+}
+
+// Função principal com exemplos para cada função
+int main() {
+    Filme filmes[10];
+    Sala salas[5];
+    Sessao sessoes[10];
+    int opcao, numFilmes = 0, numSessoes = 0;
+    int assentoEscolhido;
+
+    // Exemplo de uma sala fixa
+    salas[0].numero = 1;
+    salas[0].capacidade = 100;
+
+    // Exemplo de adicionar um filme
+    printf("\n--- Exemplo de Adicionar Filme ---\n");
+    adicionarFilme(&filmes[numFilmes]);
+    numFilmes++;
+
+    // Exemplo de criar uma sessão
+    printf("\n--- Exemplo de Criar Sessão ---\n");
+    criarSessao(&sessoes[numSessoes], filmes[0], salas[0]);
+    numSessoes++;
+
+    // Exemplo de exibir uma sessão
+    printf("\n--- Exemplo de Exibir Sessão ---\n");
+    exibirSessao(sessoes[0]);
+
+    // Exemplo de reservar um assento
+    printf("\n--- Exemplo de Reservar Assento ---\n");
+    reservarAssento(&sessoes[0], &assentoEscolhido);
+
+    // Exemplo de gerar um ingresso
+    printf("\n--- Exemplo de Gerar Ingresso ---\n");
+    gerarIngresso(sessoes[0], assentoEscolhido);
+
+    return 0;
+}
